@@ -1,0 +1,123 @@
+kind: pipeline
+type: docker
+name: docker-amd64
+
+platform:
+  os: linux
+  arch: amd64
+
+trigger:
+  event:
+  - tag
+
+steps:
+  - name: build and publish amd64
+    image: plugins/docker:linux-amd64
+    settings:
+      username:
+        from_secret: DOCKERHUB_USERNAME
+      password:
+        from_secret: DOCKERHUB_PASSWORD
+      repo: fabiodcorreia/firefly-iii
+      auto_tag: true
+      auto_tag_suffix: amd64
+      purge: true
+#tags: latest-amd64
+      
+
+---
+kind: pipeline
+type: docker
+name: docker-arm64
+
+platform:
+  os: linux
+  arch: arm64
+
+trigger:
+  event:
+  - tag
+
+steps:
+  - name: build and publish arm64v8
+    image: plugins/docker:linux-arm64
+    settings:
+      username:
+        from_secret: DOCKERHUB_USERNAME
+      password:
+        from_secret: DOCKERHUB_PASSWORD
+      repo: fabiodcorreia/firefly-iii
+      auto_tag: true
+      auto_tag_suffix: arm64v8
+      purge: true
+#tags: latest-arm64v8
+      
+
+---
+kind: pipeline
+type: docker
+name: docker-arm32
+
+platform:
+  os: linux
+  arch: arm
+
+trigger:
+  event:
+  - tag
+
+steps:
+  - name: build and publish arm32v7
+    image: plugins/docker:linux-arm
+    settings:
+      username:
+        from_secret: DOCKERHUB_USERNAME
+      password:
+        from_secret: DOCKERHUB_PASSWORD
+      repo: fabiodcorreia/firefly-iii
+      auto_tag: true
+      auto_tag_suffix: arm32v7
+      purge: true
+#tags: latest-arm32v7
+      
+
+---
+kind: pipeline
+name: docker-manifest
+
+platform:
+  os: linux
+  arch: amd64
+
+trigger:
+  event:
+  - tag
+
+steps:
+  - name: manifest
+    pull: always
+    image: plugins/manifest
+    settings:
+      auto_tag: true
+      ignore_missing: true
+      spec: manifest.tmpl
+      username:
+        from_secret: DOCKERHUB_USERNAME
+      password:
+        from_secret: DOCKERHUB_PASSWORD
+  - name: manifest latest
+    pull: always
+    image: plugins/manifest
+    settings:
+      tag: latest
+      ignore_missing: true
+      spec: manifest.tmpl
+      username:
+       from_secret: DOCKERHUB_USERNAME
+      password:
+        from_secret: DOCKERHUB_PASSWORD
+
+depends_on:
+  - docker-amd64
+  - docker-arm64
+  - docker-arm32

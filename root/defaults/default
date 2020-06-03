@@ -1,0 +1,28 @@
+server {
+	listen 80 default_server;
+	server_tokens off;
+
+	root /var/www/html/public;
+	index index.php index.html index.htm;
+
+	server_name _;
+
+	client_max_body_size 0;
+
+  error_page 599 = @noauth;
+
+  location @noauth {
+    try_files $uri $uri/ /index.php?$args;
+  }
+
+	location / {
+		try_files $uri $uri/ /index.php?$query_string;
+	}
+
+	location ~ \.php$ {
+		fastcgi_split_path_info ^(.+\.php)(/.+)$;
+		fastcgi_pass 127.0.0.1:9000;
+		fastcgi_index index.php;
+		include /etc/nginx/fastcgi_params;
+	}
+}

@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+  fireflyiii:
+    image: fabiodcorreia/firefly-iii:latest
+    container_name: fireflyiii
+    volumes:
+      - firefly_iii_config:/config
+    environment:
+      - DB_HOST=mariadb_firefly
+      - DB_DATABASE=fireflydb
+      - DB_USERNAME=firefly_user
+      - DB_PASSWORD=firefly_password
+      - APP_ENV=local
+      - LOG_CHANNEL=stack
+      - LOGIN_PROVIDER=eloquent
+    ports:
+      - 80:80
+    depends_on:
+      - fireflyiiidb
+
+  fireflyiiidb:
+    image: linuxserver/mariadb
+    container_name: mariadb_firefly
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret_firefly_password
+      - MYSQL_DATABASE=fireflydb
+      - MYSQL_USER=firefly_user
+      - MYSQL_PASSWORD=firefly_password
+    ports:
+      - 3306:3306
+    volumes:
+      - firefly_iii_db:/config
+
+volumes:
+   firefly_iii_config: {}
+   firefly_iii_db: {}
