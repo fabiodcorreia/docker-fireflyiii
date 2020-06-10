@@ -1,18 +1,18 @@
-# docker-fireflyiii
+# Docker Firefly-iii
 
-Custom Firefly III Docker Image with the following changes
+[Firefly-iii](https://www.firefly-iii.org/) A free and open source personal finance manager.
+
+This is a custom Firefly III Docker Image build on top of linuxserver.io `lsiobase/nginx` but not supported by linuxserver.io.
+
+This Image was optimized for systems with low resources and contains the following differences from the official Image:
 
 - Nginx instead of Apache
 - Nginx with 1 worker
 - PHP FPM with 1 worker
-- MySQL is the only supported database
-- No HTTPS, the server should be behind a reverse proxy
+- Only supports MySQL
+- No HTTPS
 
-[Firefly-iii](https://www.firefly-iii.org/) A free and open source personal finance manager.
-
-[![firefly-iii](https://www.firefly-iii.org/static/img/logo-small-new.png)](https://www.firefly-iii.org/)
-
-The official docker image can be found at https://github.com/firefly-iii/docker
+## The official docker image can be found at https://github.com/firefly-iii/docker
 
 ## Supported Architectures
 
@@ -27,12 +27,9 @@ The architectures supported by this image are:
 | armhf | arm32v7-latest |
 
 
-# -------------BELOW IS IN PROGRESS---------------
-
-
 ## Usage
 
-Here are some example snippets to help you get started creating a container.
+This image can be used running directly from docker cli or by docker-compose. It's also compatible with Kubernetes but no examples are provided.
 
 ### docker
 
@@ -41,45 +38,21 @@ docker create \
   --name=firefly-iii \
   -e PUID=1000 \
   -e PGID=1000 \
-  -e MYSQL_ROOT_PASSWORD=ROOT_ACCESS_PASSWORD \
   -e TZ=Europe/London \
-  -e MYSQL_DATABASE=USER_DB_NAME `#optional` \
-  -e MYSQL_USER=MYSQL_USER `#optional` \
-  -e MYSQL_PASSWORD=DATABASE_PASSWORD `#optional` \
-  -e REMOTE_SQL=http://URL1/your.sql,https://URL2/your.sql `#optional` \
+  -e DB_HOST=mariadb_firefly \
+  -e DB_DATABASE=fireflydb \
+  -e DB_USERNAME=firefly_user \
+  -e DB_PASSWORD=firefly_password \
   -p 3306:3306 \
   -v path_to_data:/config \
   --restart unless-stopped \
-  linuxserver/mariadb
+  fabiodcorreia/firefly-iii
 ```
-
 
 ### docker-compose
+An example can be found on the [repository](https://github.com/fabiodcorreia/docker-fireflyiii/blob/master/docker-compose.yml).
 
-Compatible with docker-compose v2 schemas.
-
-```
----
-version: "2.1"
-services:
-  mariadb:
-    image: linuxserver/mariadb
-    container_name: mariadb
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - MYSQL_ROOT_PASSWORD=ROOT_ACCESS_PASSWORD
-      - TZ=Europe/London
-      - MYSQL_DATABASE=USER_DB_NAME #optional
-      - MYSQL_USER=MYSQL_USER #optional
-      - MYSQL_PASSWORD=DATABASE_PASSWORD #optional
-      - REMOTE_SQL=http://URL1/your.sql,https://URL2/your.sql #optional
-    volumes:
-      - path_to_data:/config
-    ports:
-      - 3306:3306
-    restart: unless-stopped
-```
+# -------------BELOW IS IN PROGRESS---------------
 
 ## Parameters
 
@@ -98,22 +71,6 @@ Container images are configured using parameters passed at runtime (such as thos
 | `-e REMOTE_SQL=http://URL1/your.sql,https://URL2/your.sql` | Set this to ingest sql files from an http/https endpoint (comma seperated array). |
 | `-v /config` | Contains the db itself and all assorted settings. |
 
-## Environment variables from files (Docker secrets)
-
-You can set any environment variable from a file by using a special prepend `FILE__`.
-
-As an example:
-
-```
--e FILE__PASSWORD=/run/secrets/mysecretpassword
-```
-
-Will set the environment variable `PASSWORD` based on the contents of the `/run/secrets/mysecretpassword` file.
-
-## Umask for running applications
-
-For all of our images we provide the ability to override the default umask settings for services started within the containers using the optional `-e UMASK=022` setting.
-Keep in mind umask is not chmod it subtracts from permissions based on it's value it does not add. Please read up [here](https://en.wikipedia.org/wiki/Umask) before asking for support.
 
 ## User / Group Identifiers
 
@@ -208,21 +165,3 @@ Below are the instructions for updating containers:
 
 * You can also remove the old dangling images: `docker image prune`
 
-## Building locally
-
-If you want to make local modifications to these images for development purposes or just to customize the logic:
-```
-git clone https://github.com/linuxserver/docker-mariadb.git
-cd docker-mariadb
-docker build \
-  --no-cache \
-  --pull \
-  -t linuxserver/mariadb:latest .
-```
-
-The ARM variants can be built on x86_64 hardware using `multiarch/qemu-user-static`
-```
-docker run --rm --privileged multiarch/qemu-user-static:register --reset
-```
-
-Once registered you can define the dockerfile to use with `-f Dockerfile.aarch64`.
