@@ -19,6 +19,7 @@ WORKDIR ${FIREFLY_PATH}
 RUN \
   apk add --no-cache \
   curl \
+  memcached \
 	php7-opcache \
 	php7-curl \
 	php7-gd \
@@ -31,10 +32,11 @@ RUN \
 	php7-tokenizer \
 	php7-iconv \
 	php7-dom \
-	php7-pdo_mysql
-	
+	php7-pdo_mysql \
+  php7-memcached
+
 # Install Composer, Firefly and custom configureation
-RUN \  
+RUN \
   echo "**** install composer ****" && \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
   echo "**** install composer parallel execution plugin ****" && \
