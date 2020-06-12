@@ -3,7 +3,9 @@
 echo "**** start 96-volumes.sh ****"
 
 # create directory structure
-mkdir -p /config/www/{upload,logs, export}
+mkdir -p /config/www/upload
+mkdir -p /config/www/logs
+mkdir -p /config/www/export
 mkdir -p $FIREFLY_PATH/storage/logs
 mkdir -p $FIREFLY_PATH/storage/upload
 mkdir -p $FIREFLY_PATH/storage/export
