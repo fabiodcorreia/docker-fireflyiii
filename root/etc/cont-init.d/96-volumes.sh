@@ -3,7 +3,7 @@
 echo "**** start 96-volumes.sh ****"
 
 # create directory structure
-#mkdir -p /config/www/{upload,logs}
+mkdir -p /config/www/{upload,logs, export}
 mkdir -p $FIREFLY_PATH/storage/logs
 mkdir -p $FIREFLY_PATH/storage/upload
 mkdir -p $FIREFLY_PATH/storage/export
@@ -18,7 +18,7 @@ symlinks=( \
 for i in "${symlinks[@]}"
 do
 [[ -e "$i" && ! -L "$i" ]] && rm -rf "$i"
-[[ ! -L "$i" ]] && ln -s "$i" /config/www/"$(basename "$i")"
+[[ ! -L "$i" ]] && ln -s /config/www/"$(basename "$i")" "$i"
 done
 
 # set permissions
